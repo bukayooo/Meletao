@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22522" systemVersion="23C71" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="MemorizationSession" representedClassName="MemorizationSession" syncable="YES">
+        <attribute name="date" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isCompleted" optional="NO" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="nextReviewDate" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="reviewCount" optional="NO" attributeType="Integer 32" defaultValue="0" usesScalarValueType="YES"/>
+        <relationship name="poem" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Poem" inverseName="memorizationSessions" inverseEntity="Poem"/>
+    </entity>
+    <entity name="Poem" representedClassName="Poem" syncable="YES">
+        <attribute name="author" optional="NO" attributeType="String"/>
+        <attribute name="dateAdded" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="fullText" optional="NO" attributeType="String"/>
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isInLibrary" optional="NO" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="sectionCount" optional="NO" attributeType="Integer 32" defaultValue="0" usesScalarValueType="YES"/>
+        <attribute name="title" optional="NO" attributeType="String"/>
+        <attribute name="wordCount" optional="NO" attributeType="Integer 32" defaultValue="0" usesScalarValueType="YES"/>
+        <relationship name="memorizationSessions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="MemorizationSession" inverseName="poem" inverseEntity="MemorizationSession"/>
+        <relationship name="sections" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PoemSection" inverseName="poem" inverseEntity="PoemSection"/>
+    </entity>
+    <entity name="PoemSection" representedClassName="PoemSection" syncable="YES">
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="sectionNumber" optional="NO" attributeType="Integer 32" defaultValue="0" usesScalarValueType="YES"/>
+        <attribute name="text" optional="NO" attributeType="String"/>
+        <attribute name="wordCount" optional="NO" attributeType="Integer 32" defaultValue="0" usesScalarValueType="YES"/>
+        <relationship name="poem" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Poem" inverseName="sections" inverseEntity="Poem"/>
+    </entity>
+</model>
