@@ -131,6 +131,6 @@ extension Poem {
     "Self-Discovery", "Purpose", "Meaning", "Achievement", "Success",
     "Failure", "Perseverance", "Determination", "Character", "Virtue",
     "Ethics", "Morality", "Conscience", "Responsibility", "Discipline",
-    "Temperance", "Prudence", "Fortitude"
+    "Temperance", "Prudence", "Fortitude", "Rhetoric"
 ].sorted()
 }

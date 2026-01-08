@@ -83,8 +83,9 @@ struct LibraryView: View {
                     ScrollView {
                         LazyVGrid(columns: [
                             GridItem(.fixed(350)),
+                            GridItem(.fixed(350)),
                             GridItem(.fixed(350))
-                        ], spacing: 20) {
+                        ], spacing: 50) {
                             ForEach(filteredPoems, id: \.id) { poem in
                                 PoemCard(poem: poem, isInCatalog: false)
                             }

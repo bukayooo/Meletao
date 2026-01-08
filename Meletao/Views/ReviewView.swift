@@ -29,8 +29,9 @@ struct ReviewView: View {
                     ScrollView {
                         LazyVGrid(columns: [
                             GridItem(.fixed(350)),
+                            GridItem(.fixed(350)),
                             GridItem(.fixed(350))
-                        ], spacing: 20) {
+                        ], spacing: 50) {
                             ForEach(poemsForReview, id: \.id) { poem in
                                 ReviewCard(poem: poem)
                             }

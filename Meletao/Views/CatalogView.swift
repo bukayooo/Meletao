@@ -53,10 +53,10 @@ struct CatalogView: View {
                 // Filters
                 HStack(spacing: 16) {
                     // Category filter
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Category")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                    HStack(spacing: 8) {
+                        Text("Category:")
+                            .font(.body)
+                            .foregroundColor(.primary)
                         Picker("Category", selection: $selectedCategory) {
                             Text("All").tag("All")
                             ForEach(Poem.categories, id: \.self) { category in
@@ -66,12 +66,12 @@ struct CatalogView: View {
                         .pickerStyle(.menu)
                         .frame(width: 140)
                     }
-                    
+
                     // Tag filter
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Tags")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                    HStack(spacing: 8) {
+                        Text("Tag:")
+                            .font(.body)
+                            .foregroundColor(.primary)
                         Menu(selectedTags.isEmpty ? "All Tags" : "\(selectedTags.count) selected") {
                             Button(action: {
                                 selectedTags.removeAll()
@@ -83,9 +83,9 @@ struct CatalogView: View {
                                     }
                                 }
                             }
-                            
+
                             Divider()
-                            
+
                             ForEach(Poem.availableTags, id: \.self) { tag in
                                 Button(action: {
                                     if selectedTags.contains(tag) {
@@ -138,8 +138,9 @@ struct CatalogView: View {
                     ScrollView {
                         LazyVGrid(columns: [
                             GridItem(.fixed(350)),
+                            GridItem(.fixed(350)),
                             GridItem(.fixed(350))
-                        ], spacing: 20) {
+                        ], spacing: 50) {
                             ForEach(filteredPoems, id: \.id) { poem in
                                 PoemCard(poem: poem, isInCatalog: true)
                             }
