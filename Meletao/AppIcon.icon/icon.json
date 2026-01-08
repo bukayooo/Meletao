@@ -1,0 +1,68 @@
+{
+  "fill" : {
+    "solid" : "display-p3:0.89697,0.86719,0.65430,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "image-name" : "Generated Image Jan 8 2026 from Google AI Studio (1) 2.png",
+          "name" : "Generated Image Jan 8 2026 from Google AI Studio (1) 2"
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "image-name" : "Generated Image Jan 8 2026 from Google AI Studio 2.png",
+          "name" : "Generated Image Jan 8 2026 from Google AI Studio 2",
+          "position" : {
+            "scale" : 1.05,
+            "translation-in-points" : [
+              0.47500000000002274,
+              1.5750000000000455
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "image-name" : "1024 copy 2.png",
+          "name" : "1024 copy 2"
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
