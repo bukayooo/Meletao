@@ -151,6 +151,7 @@ struct PoemDetailView: View {
         
         do {
             try viewContext.save()
+            NotificationService.shared.updateAppBadge(context: viewContext)
             dismiss()
         } catch {
             print("Error adding poem to library: \(error)")
@@ -162,6 +163,7 @@ struct PoemDetailView: View {
         
         do {
             try viewContext.save()
+            NotificationService.shared.updateAppBadge(context: viewContext)
         } catch {
             print("Error removing poem from library: \(error)")
         }

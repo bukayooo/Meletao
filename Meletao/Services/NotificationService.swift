@@ -20,6 +20,18 @@ class NotificationService {
         
         // Schedule persistent reminders for overdue poems
         scheduleOverdueReminders(for: overduePoems, context: context)
+        
+        // Update app badge with current review count
+        updateAppBadge(context: context)
+    }
+    
+    func updateAppBadge(context: NSManagedObjectContext) {
+        let poemsForReview = SpacedRepetitionService.shared.getPoemsForReview(context: context)
+        let badgeCount = poemsForReview.count
+        
+        DispatchQueue.main.async {
+            NSApp.dockTile.badgeLabel = badgeCount > 0 ? "\(badgeCount)" : nil
+        }
     }
     
     private func scheduleNotification(for date: Date, context: NSManagedObjectContext) {

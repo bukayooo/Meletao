@@ -15,6 +15,11 @@ struct MeletaoApp: App {
                     CalendarService.shared.requestCalendarAccess()
                     scheduleInitialNotifications()
                 }
+                .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                    // Update badge when app becomes active
+                    let context = persistenceController.container.viewContext
+                    NotificationService.shared.updateAppBadge(context: context)
+                }
         }
     }
     
@@ -32,6 +37,7 @@ struct MeletaoApp: App {
         let context = persistenceController.container.viewContext
         NotificationService.shared.scheduleReviewNotifications(context: context)
         NotificationService.shared.scheduleDailyNotificationRefresh(context: context)
+        NotificationService.shared.updateAppBadge(context: context)
         CalendarService.shared.addReviewEventsToCalendar(context: context)
     }
 }
