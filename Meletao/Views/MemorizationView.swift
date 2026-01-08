@@ -90,7 +90,9 @@ struct MemorizationView: View {
                         .padding()
                         .background(Color.staticMeletaoCardBackground)
                         .cornerRadius(12)
-                        .multilineTextAlignment(.center)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.horizontal)
             }
@@ -136,7 +138,9 @@ struct MemorizationView: View {
                 .padding()
                 .background(Color.staticMeletaoCardBackground)
                 .cornerRadius(12)
-                .multilineTextAlignment(.center)
+                .multilineTextAlignment(.leading)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
             
             Spacer()
             
@@ -171,6 +175,8 @@ struct MemorizationView: View {
                         .foregroundColor(.secondary)
                         .opacity(0.7)
                         .multilineTextAlignment(.leading)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding()
                 .background(Color.staticMeletaoCardBackground.opacity(0.5))
