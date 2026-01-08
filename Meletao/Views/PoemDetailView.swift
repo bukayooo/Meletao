@@ -131,9 +131,9 @@ struct PoemDetailView: View {
             AddPoemView(poemToEdit: poem)
         }
         .sheet(isPresented: $shouldNavigateToStudy) {
-            NavigationStack {
-                MemorizationView(poem: poem)
-            }
+            MemorizationView(poem: poem)
+                .frame(minWidth: 1000, minHeight: 800)
+                .interactiveDismissDisabled(false)
         }
         .alert("Remove from Library", isPresented: $showingAlert) {
             Button("Cancel", role: .cancel) { }

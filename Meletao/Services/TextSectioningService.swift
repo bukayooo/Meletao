@@ -9,30 +9,37 @@ class TextSectioningService {
     func createSectionsForPoem(_ poem: Poem, context: NSManagedObjectContext) {
         let wordCount = Int(poem.wordCount)
         let sectionSize = calculateSectionSize(wordCount: wordCount)
-        let words = poem.fullText.components(separatedBy: .whitespacesAndNewlines)
-            .filter { !$0.isEmpty }
-        
+        let lines = poem.fullText.components(separatedBy: .newlines)
+
         var sections: [String] = []
-        var currentSection = ""
+        var currentSectionLines: [String] = []
         var currentWordCount = 0
-        
-        for word in words {
-            if currentWordCount >= sectionSize && !currentSection.isEmpty {
-                sections.append(currentSection.trimmingCharacters(in: .whitespacesAndNewlines))
-                currentSection = ""
+
+        for line in lines {
+            let lineWords = line.components(separatedBy: .whitespaces)
+                .filter { !$0.isEmpty }
+            let lineWordCount = lineWords.count
+
+            // If adding this line would exceed the section size and we already have content,
+            // save the current section and start a new one
+            if currentWordCount > 0 && currentWordCount + lineWordCount > sectionSize {
+                sections.append(currentSectionLines.joined(separator: "\n"))
+                currentSectionLines = []
                 currentWordCount = 0
             }
-            
-            currentSection += (currentSection.isEmpty ? "" : " ") + word
-            currentWordCount += 1
+
+            // Add the line to the current section
+            currentSectionLines.append(line)
+            currentWordCount += lineWordCount
         }
-        
-        if !currentSection.isEmpty {
-            sections.append(currentSection.trimmingCharacters(in: .whitespacesAndNewlines))
+
+        // Add the last section if it has content
+        if !currentSectionLines.isEmpty {
+            sections.append(currentSectionLines.joined(separator: "\n"))
         }
-        
+
         poem.sectionCount = Int32(sections.count)
-        
+
         for (index, sectionText) in sections.enumerated() {
             let section = PoemSection(context: context)
             section.id = UUID()

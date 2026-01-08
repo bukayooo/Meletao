@@ -31,7 +31,31 @@ struct MemorizationView: View {
     }
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 0) {
+            // Header with close button
+            HStack {
+                Text(poem.title)
+                    .font(.title2)
+                    .fontWeight(.semibold)
+
+                Spacer()
+
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding()
+            .background(Color(.windowBackgroundColor))
+
+            Divider()
+
+            // Main content
+            VStack(spacing: 20) {
                 if isShowingFullPoem {
                     fullPoemView
                 } else if let section = currentSection {
@@ -39,18 +63,10 @@ struct MemorizationView: View {
                 } else {
                     completionView
                 }
-        }
-        .padding()
-        .background(Color(.windowBackgroundColor))
-        .navigationTitle(poem.title)
-        .navigationBarBackButtonHidden(false)
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button("Exit") {
-                    dismiss()
-                }
             }
+            .padding()
         }
+        .background(Color(.windowBackgroundColor))
         .alert("Memorization Complete!", isPresented: $showingCompletionAlert) {
             Button("Finish") {
                 completeMemorization()

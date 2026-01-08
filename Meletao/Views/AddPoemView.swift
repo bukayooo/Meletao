@@ -207,11 +207,15 @@ struct AddPoemView: View {
         poem.category = category
         poem.setTags(Array(selectedTags))
         poem.wordCount = Int32(TextSectioningService.shared.wordCount(for: poem.fullText))
-        
-        // Only recreate sections if text changed or it's a new poem
-        if poemToEdit == nil || poemToEdit?.fullText != poem.fullText {
-            TextSectioningService.shared.createSectionsForPoem(poem, context: viewContext)
+
+        // Always recreate sections to ensure newlines are preserved
+        // Delete old sections first if editing
+        if poemToEdit != nil {
+            poem.sectionsArray.forEach { section in
+                viewContext.delete(section)
+            }
         }
+        TextSectioningService.shared.createSectionsForPoem(poem, context: viewContext)
         
         do {
             try viewContext.save()
