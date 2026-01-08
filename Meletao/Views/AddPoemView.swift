@@ -140,7 +140,7 @@ struct AddPoemView: View {
                         
                         TextEditor(text: $text)
                             .font(.system(.body, design: .default))
-                            .frame(minHeight: 200)
+                            .frame(height: 200)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.gray.opacity(0.3), lineWidth: 1)
@@ -153,7 +153,7 @@ struct AddPoemView: View {
                         
                         TextEditor(text: $notes)
                             .font(.system(.body, design: .default))
-                            .frame(minHeight: 100)
+                            .frame(height: 100)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.gray.opacity(0.3), lineWidth: 1)
