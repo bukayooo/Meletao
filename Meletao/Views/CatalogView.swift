@@ -57,7 +57,7 @@ struct CatalogView: View {
                         Text("Category:")
                             .font(.body)
                             .foregroundColor(.primary)
-                        Picker("Category", selection: $selectedCategory) {
+                        Picker("", selection: $selectedCategory) {
                             Text("All").tag("All")
                             ForEach(Poem.categories, id: \.self) { category in
                                 Text(category).tag(category)
@@ -69,7 +69,7 @@ struct CatalogView: View {
 
                     // Tag filter
                     HStack(spacing: 8) {
-                        Text("Tag:")
+                        Text("Tags:")
                             .font(.body)
                             .foregroundColor(.primary)
                         Menu(selectedTags.isEmpty ? "All Tags" : "\(selectedTags.count) selected") {
