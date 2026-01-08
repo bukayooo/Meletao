@@ -19,7 +19,7 @@ class NotificationService {
     
     private func scheduleNotification(for date: Date, context: NSManagedObjectContext) {
         let content = UNMutableNotificationContent()
-        content.title = "Meletao Review Time"
+        content.title = "Review Time"
         
         let poemsCount = SpacedRepetitionService.shared.getPoemsForReview(context: context).count
         if poemsCount == 1 {

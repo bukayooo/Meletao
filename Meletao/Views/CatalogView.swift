@@ -52,19 +52,21 @@ struct CatalogView: View {
                     }
                     Spacer()
                 } else {
-                    LazyVGrid(columns: [
-                        GridItem(.fixed(350)),
-                        GridItem(.fixed(350))
-                    ], spacing: 20) {
-                        ForEach(filteredPoems, id: \.id) { poem in
-                            PoemCard(poem: poem, isInCatalog: true)
+                    ScrollView {
+                        LazyVGrid(columns: [
+                            GridItem(.fixed(350)),
+                            GridItem(.fixed(350))
+                        ], spacing: 20) {
+                            ForEach(filteredPoems, id: \.id) { poem in
+                                PoemCard(poem: poem, isInCatalog: true)
+                            }
                         }
+                        .padding()
                     }
-                    .padding()
                 }
             }
             .sheet(isPresented: $showingAddPoem) {
-                AddPoemView()
+                AddPoemView(poemToEdit: nil)
             }
     }
 }

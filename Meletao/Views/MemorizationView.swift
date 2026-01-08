@@ -78,15 +78,22 @@ struct MemorizationView: View {
                 .padding(.horizontal)
                 .multilineTextAlignment(.center)
             
-            Spacer()
-            
-            Text(processedSectionText(section))
-                .font(.title2)
-                .lineSpacing(8)
-                .padding()
-                .background(Color.staticMeletaoCardBackground)
-                .cornerRadius(12)
-                .multilineTextAlignment(.center)
+            ScrollView {
+                VStack(spacing: 16) {
+                    if currentSectionIndex > 0 {
+                        previousSectionsView
+                    }
+                    
+                    Text(processedSectionText(section))
+                        .font(.title2)
+                        .lineSpacing(8)
+                        .padding()
+                        .background(Color.staticMeletaoCardBackground)
+                        .cornerRadius(12)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.horizontal)
+            }
             
             Spacer()
             
@@ -139,6 +146,40 @@ struct MemorizationView: View {
             .buttonStyle(.borderedProminent)
             .tint(Color.staticMeletaoAccent)
             .controlSize(.large)
+        }
+    }
+    
+    @ViewBuilder
+    private var previousSectionsView: some View {
+        VStack(spacing: 12) {
+            ForEach(0..<currentSectionIndex, id: \.self) { index in
+                let previousSection = poem.sectionsArray[index]
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("Section \(index + 1)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                    }
+                    
+                    Text(previousSection.text)
+                        .font(.footnote)
+                        .lineSpacing(4)
+                        .foregroundColor(.secondary)
+                        .opacity(0.7)
+                        .multilineTextAlignment(.leading)
+                }
+                .padding()
+                .background(Color.staticMeletaoCardBackground.opacity(0.5))
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
+                )
+            }
         }
     }
     

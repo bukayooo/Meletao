@@ -6,6 +6,7 @@ struct PoemDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     @State private var showingAlert = false
+    @State private var showingEditSheet = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -24,6 +25,11 @@ struct PoemDetailView: View {
                 Spacer()
                 
                 HStack(spacing: 12) {
+                    Button("Edit") {
+                        showingEditSheet = true
+                    }
+                    .buttonStyle(.bordered)
+                    
                     Button("Close") {
                         dismiss()
                     }
@@ -38,7 +44,7 @@ struct PoemDetailView: View {
                         NavigationLink("Study", destination: MemorizationView(poem: poem))
                             .buttonStyle(.borderedProminent)
                         
-                        Button("Remove from Library") {
+                        Button("Remove") {
                             showingAlert = true
                         }
                         .buttonStyle(.bordered)
@@ -77,20 +83,50 @@ struct PoemDetailView: View {
             .padding(.vertical, 8)
             .background(Color(.controlBackgroundColor))
             
-            // Full poem text
+            // Full poem text and notes
             ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    Text(poem.fullText)
-                        .font(.system(.body, design: .serif))
-                        .lineSpacing(4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                        .textSelection(.enabled)
+                VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Poem")
+                            .font(.headline)
+                            .padding(.horizontal)
+                        
+                        Text(poem.fullText)
+                            .font(.system(.body, design: .serif))
+                            .lineSpacing(4)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                            .textSelection(.enabled)
+                            .background(Color(.textBackgroundColor))
+                            .cornerRadius(8)
+                            .padding(.horizontal)
+                    }
+                    
+                    if !poem.notes.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Notes")
+                                .font(.headline)
+                                .padding(.horizontal)
+                            
+                            Text(poem.notes)
+                                .font(.system(.body))
+                                .lineSpacing(4)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding()
+                                .textSelection(.enabled)
+                                .background(Color(.controlBackgroundColor))
+                                .cornerRadius(8)
+                                .padding(.horizontal)
+                        }
+                    }
                 }
+                .padding(.vertical)
             }
-            .background(Color(.textBackgroundColor))
         }
         .frame(minWidth: 600, minHeight: 500)
+        .sheet(isPresented: $showingEditSheet) {
+            AddPoemView(poemToEdit: poem)
+        }
         .alert("Remove from Library", isPresented: $showingAlert) {
             Button("Cancel", role: .cancel) { }
             Button("Remove", role: .destructive) {

@@ -11,6 +11,7 @@ public class Poem: NSManagedObject {
     @NSManaged public var title: String
     @NSManaged public var author: String
     @NSManaged public var fullText: String
+    @NSManaged public var notes: String
     @NSManaged public var wordCount: Int32
     @NSManaged public var sectionCount: Int32
     @NSManaged public var dateAdded: Date

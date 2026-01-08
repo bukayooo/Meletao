@@ -80,15 +80,17 @@ struct LibraryView: View {
                     }
                     Spacer()
                 } else {
-                    LazyVGrid(columns: [
-                        GridItem(.fixed(350)),
-                        GridItem(.fixed(350))
-                    ], spacing: 20) {
-                        ForEach(filteredPoems, id: \.id) { poem in
-                            PoemCard(poem: poem, isInCatalog: false)
+                    ScrollView {
+                        LazyVGrid(columns: [
+                            GridItem(.fixed(350)),
+                            GridItem(.fixed(350))
+                        ], spacing: 20) {
+                            ForEach(filteredPoems, id: \.id) { poem in
+                                PoemCard(poem: poem, isInCatalog: false)
+                            }
                         }
+                        .padding()
                     }
-                    .padding()
                 }
             }
     }
