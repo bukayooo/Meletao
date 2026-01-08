@@ -12,6 +12,8 @@ public class Poem: NSManagedObject {
     @NSManaged public var author: String
     @NSManaged public var fullText: String
     @NSManaged public var notes: String
+    @NSManaged public var category: String
+    @NSManaged public var tags: String
     @NSManaged public var wordCount: Int32
     @NSManaged public var sectionCount: Int32
     @NSManaged public var dateAdded: Date
@@ -65,4 +67,71 @@ extension Poem: Identifiable {
         guard let nextReview = nextReviewDate else { return isInLibrary }
         return Date() >= nextReview && isInLibrary
     }
+    
+    var tagsArray: [String] {
+        guard !tags.isEmpty else { return [] }
+        return tags.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+    }
+    
+    func setTags(_ tagArray: [String]) {
+        tags = tagArray.joined(separator: ", ")
+    }
+}
+
+// MARK: - Categories and Tags
+extension Poem {
+    static let categories = [
+        "Poem",
+        "Book Excerpt",
+        "Bible Verse",
+        "Speech",
+        "Song Lyrics",
+        "Prayer",
+        "Quote",
+        "Essay",
+        "Letter",
+        "Monologue",
+        "Philosophy",
+        "Literature"
+    ]
+    
+    static let availableTags = [
+        // Emotions
+        "Love", "Joy", "Hope", "Peace", "Gratitude", "Wonder", "Inspiration",
+        "Melancholy", "Sadness", "Grief", "Loss", "Longing", "Nostalgia", 
+        "Solitude", "Contemplation", "Reflection", "Introspection",
+        
+        // Life Themes
+        "Mortality", "Death", "Life", "Birth", "Growth", "Change", "Time",
+        "Memory", "Dreams", "Childhood", "Youth", "Age", "Wisdom",
+        "Journey", "Adventure", "Discovery", "Courage", "Strength",
+        
+        // Relationships
+        "Family", "Friendship", "Romance", "Marriage", "Parenthood",
+        "Community", "Society", "Humanity", "Compassion", "Empathy",
+        
+        // Spiritual/Religious
+        "Faith", "God", "Divine", "Sacred", "Prayer", "Worship", "Grace",
+        "Redemption", "Forgiveness", "Soul", "Heaven", "Eternity",
+        "Christianity", "Bible", "Jesus", "Scripture",
+        
+        // Nature
+        "Nature", "Seasons", "Spring", "Summer", "Autumn", "Winter",
+        "Ocean", "Mountains", "Forest", "Sky", "Stars", "Moon", "Sun",
+        "Rain", "Storm", "Garden", "Flowers", "Trees", "Birds", "Animals",
+        
+        // Abstract Concepts
+        "Beauty", "Truth", "Justice", "Freedom", "Liberty", "Democracy",
+        "Honor", "Duty", "Sacrifice", "Heroism", "Patriotism", "War", "Peace",
+        "Philosophy", "Knowledge", "Learning", "Education", "Art", "Creativity",
+        
+        // Social Issues
+        "Equality", "Social Justice", "Poverty", "Wealth", "Work", "Labor",
+        "Politics", "Government", "History", "Culture", "Tradition", "Progress",
+        
+        // Personal Growth
+        "Self-Discovery", "Purpose", "Meaning", "Achievement", "Success",
+        "Failure", "Perseverance", "Resilience", "Determination", "Character",
+        "Virtue", "Ethics", "Morality", "Conscience", "Responsibility"
+    ].sorted()
 }

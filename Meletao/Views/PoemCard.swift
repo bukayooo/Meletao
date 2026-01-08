@@ -45,6 +45,34 @@ struct PoemCard: View {
                         .foregroundColor(.secondary)
                 }
                 
+                HStack {
+                    Text(poem.category)
+                        .font(.caption2)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.blue.opacity(0.2))
+                        .cornerRadius(4)
+                    
+                    if !poem.tagsArray.isEmpty {
+                        ForEach(poem.tagsArray.prefix(3), id: \.self) { tag in
+                            Text(tag)
+                                .font(.caption2)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.green.opacity(0.2))
+                                .cornerRadius(4)
+                        }
+                        
+                        if poem.tagsArray.count > 3 {
+                            Text("+\(poem.tagsArray.count - 3)")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    Spacer()
+                }
+                
                 Text(poem.fullText.prefix(100) + (poem.fullText.count > 100 ? "..." : ""))
                     .font(.caption)
                     .foregroundColor(.secondary)

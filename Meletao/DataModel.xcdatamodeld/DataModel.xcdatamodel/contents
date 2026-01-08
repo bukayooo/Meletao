@@ -10,12 +10,14 @@
     </entity>
     <entity name="Poem" representedClassName="Poem" syncable="YES">
         <attribute name="author" optional="NO" attributeType="String"/>
+        <attribute name="category" optional="NO" attributeType="String" defaultValue="Poem"/>
         <attribute name="dateAdded" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="fullText" optional="NO" attributeType="String"/>
         <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isInLibrary" optional="NO" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="notes" optional="YES" attributeType="String" defaultValue=""/>
         <attribute name="sectionCount" optional="NO" attributeType="Integer 32" defaultValue="0" usesScalarValueType="YES"/>
+        <attribute name="tags" optional="YES" attributeType="String" defaultValue=""/>
         <attribute name="title" optional="NO" attributeType="String"/>
         <attribute name="wordCount" optional="NO" attributeType="Integer 32" defaultValue="0" usesScalarValueType="YES"/>
         <relationship name="memorizationSessions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="MemorizationSession" inverseName="poem" inverseEntity="MemorizationSession"/>

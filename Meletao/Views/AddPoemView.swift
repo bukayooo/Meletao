@@ -11,6 +11,8 @@ struct AddPoemView: View {
     @State private var author = ""
     @State private var text = ""
     @State private var notes = ""
+    @State private var category = "Poem"
+    @State private var selectedTags: Set<String> = []
     @State private var showingAlert = false
     @State private var alertMessage = ""
     
@@ -65,6 +67,64 @@ struct AddPoemView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
+                        Text("Category")
+                            .font(.headline)
+                        Picker("Category", selection: $category) {
+                            ForEach(Poem.categories, id: \.self) { category in
+                                Text(category).tag(category)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .frame(maxWidth: 200, alignment: .leading)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Tags")
+                            .font(.headline)
+                        
+                        if !selectedTags.isEmpty {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 8) {
+                                ForEach(Array(selectedTags).sorted(), id: \.self) { tag in
+                                    HStack {
+                                        Text(tag)
+                                            .font(.caption)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 4)
+                                            .background(Color.blue.opacity(0.2))
+                                            .cornerRadius(12)
+                                        
+                                        Button(action: {
+                                            selectedTags.remove(tag)
+                                        }) {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .foregroundColor(.secondary)
+                                                .font(.caption)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                            }
+                        }
+                        
+                        Menu("Add Tags") {
+                            ForEach(Poem.availableTags, id: \.self) { tag in
+                                Button(action: {
+                                    selectedTags.insert(tag)
+                                }) {
+                                    HStack {
+                                        Text(tag)
+                                        if selectedTags.contains(tag) {
+                                            Image(systemName: "checkmark")
+                                        }
+                                    }
+                                }
+                                .disabled(selectedTags.contains(tag))
+                            }
+                        }
+                        .frame(maxWidth: 150, alignment: .leading)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Text("Text")
                                 .font(.headline)
@@ -112,6 +172,8 @@ struct AddPoemView: View {
                 author = poem.author
                 text = poem.fullText
                 notes = poem.notes
+                category = poem.category
+                selectedTags = Set(poem.tagsArray)
             }
         }
         .alert("Error", isPresented: $showingAlert) {
@@ -134,12 +196,16 @@ struct AddPoemView: View {
             poem.dateAdded = Date()
             poem.isInLibrary = false
             poem.notes = ""
+            poem.category = "Poem"
+            poem.tags = ""
         }
         
         poem.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
         poem.author = author.trimmingCharacters(in: .whitespacesAndNewlines)
         poem.fullText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         poem.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        poem.category = category
+        poem.setTags(Array(selectedTags))
         poem.wordCount = Int32(TextSectioningService.shared.wordCount(for: poem.fullText))
         
         // Only recreate sections if text changed or it's a new poem
