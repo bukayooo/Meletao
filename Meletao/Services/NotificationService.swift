@@ -1,6 +1,7 @@
 import Foundation
 import UserNotifications
 import CoreData
+import AppKit
 
 class NotificationService {
     static let shared = NotificationService()

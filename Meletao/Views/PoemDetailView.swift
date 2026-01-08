@@ -130,7 +130,7 @@ struct PoemDetailView: View {
         .sheet(isPresented: $showingEditSheet) {
             AddPoemView(poemToEdit: poem)
         }
-        .fullScreenCover(isPresented: $shouldNavigateToStudy) {
+        .sheet(isPresented: $shouldNavigateToStudy) {
             NavigationStack {
                 MemorizationView(poem: poem)
             }
