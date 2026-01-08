@@ -4,6 +4,7 @@ import CoreData
 struct ReviewView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var poemsForReview: [Poem] = []
+    @State private var refreshTrigger = UUID()
     
     var body: some View {
         VStack {
@@ -39,6 +40,12 @@ struct ReviewView: View {
                 }
             }
             .onAppear {
+                loadPoemsForReview()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
+                loadPoemsForReview()
+            }
+            .onChange(of: refreshTrigger) { _ in
                 loadPoemsForReview()
             }
     }

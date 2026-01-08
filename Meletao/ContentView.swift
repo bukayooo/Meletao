@@ -56,12 +56,16 @@ struct ContentView: View {
                     switch selectedTab {
                     case 0:
                         CatalogView()
+                            .id("catalog-\(selectedTab)")
                     case 1:
                         LibraryView()
+                            .id("library-\(selectedTab)")
                     case 2:
                         ReviewView()
+                            .id("review-\(selectedTab)")
                     default:
                         CatalogView()
+                            .id("default-\(selectedTab)")
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

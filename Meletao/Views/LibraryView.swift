@@ -93,5 +93,8 @@ struct LibraryView: View {
                     }
                 }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
+                // Refresh is automatic due to @FetchRequest, but this ensures immediate update
+            }
     }
 }

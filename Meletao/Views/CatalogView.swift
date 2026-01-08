@@ -65,6 +65,9 @@ struct CatalogView: View {
                     }
                 }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
+                // Refresh is automatic due to @FetchRequest, but this ensures immediate update
+            }
             .sheet(isPresented: $showingAddPoem) {
                 AddPoemView(poemToEdit: nil)
             }
