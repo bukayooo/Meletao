@@ -41,7 +41,7 @@ struct MemorizationView: View {
                 }
         }
         .padding()
-        .background(Color.staticMeletaoBackground)
+        .background(Color(.windowBackgroundColor))
         .navigationTitle(poem.title)
         .navigationBarBackButtonHidden(false)
         .toolbar {
@@ -250,55 +250,64 @@ struct MemorizationView: View {
     }
     
     private func hideWordsWithFirstLetter(_ text: String, hideRatio: Double) -> String {
-        let words = text.components(separatedBy: .whitespacesAndNewlines)
-        let wordsToHide = Int(Double(words.count) * hideRatio)
-        let cacheKey = "\(currentSectionIndex)-\(currentStage)-\(hideRatio)"
-        
-        // Use cached indices if they exist
-        let hiddenIndices: Set<Int>
-        if let cached = hiddenIndicesCache[cacheKey] {
-            hiddenIndices = cached
-        } else {
-            var newHiddenIndices = Set<Int>()
-            while newHiddenIndices.count < wordsToHide && newHiddenIndices.count < words.count {
-                let randomIndex = Int.random(in: 0..<words.count)
-                let word = words[randomIndex]
-                let cleanWord = cleanWordForChecking(word)
-                if !cleanWord.isEmpty && cleanWord.count > 1 {
-                    newHiddenIndices.insert(randomIndex)
+        let lines = text.components(separatedBy: .newlines)
+        let processedLines = lines.map { line -> String in
+            let words = line.components(separatedBy: .whitespaces)
+            let wordsToHide = Int(Double(words.count) * hideRatio)
+            let cacheKey = "\(currentSectionIndex)-\(currentStage)-\(hideRatio)-\(line.hashValue)"
+            
+            // Use cached indices if they exist
+            let hiddenIndices: Set<Int>
+            if let cached = hiddenIndicesCache[cacheKey] {
+                hiddenIndices = cached
+            } else {
+                var newHiddenIndices = Set<Int>()
+                while newHiddenIndices.count < wordsToHide && newHiddenIndices.count < words.count {
+                    let randomIndex = Int.random(in: 0..<words.count)
+                    let word = words[randomIndex]
+                    let cleanWord = cleanWordForChecking(word)
+                    if !cleanWord.isEmpty && cleanWord.count > 1 {
+                        newHiddenIndices.insert(randomIndex)
+                    }
+                }
+                hiddenIndices = newHiddenIndices
+                
+                // Cache the result using a dispatch to avoid state mutation during view update
+                DispatchQueue.main.async {
+                    self.hiddenIndicesCache[cacheKey] = hiddenIndices
                 }
             }
-            hiddenIndices = newHiddenIndices
             
-            // Cache the result using a dispatch to avoid state mutation during view update
-            DispatchQueue.main.async {
-                self.hiddenIndicesCache[cacheKey] = hiddenIndices
-            }
+            return words.enumerated().map { index, word in
+                if hiddenIndices.contains(index) && !word.isEmpty {
+                    let (cleanWord, punctuation) = separateWordFromPunctuation(word)
+                    if cleanWord.count > 1 {
+                        let firstLetter = String(cleanWord.first!)
+                        let underlines = String(repeating: "_", count: cleanWord.count - 1)
+                        return firstLetter + underlines + punctuation
+                    }
+                }
+                return word
+            }.joined(separator: " ")
         }
         
-        return words.enumerated().map { index, word in
-            if hiddenIndices.contains(index) && !word.isEmpty {
-                let (cleanWord, punctuation) = separateWordFromPunctuation(word)
-                if cleanWord.count > 1 {
-                    let firstLetter = String(cleanWord.first!)
-                    let underlines = String(repeating: "_", count: cleanWord.count - 1)
-                    return firstLetter + underlines + punctuation
-                }
-            }
-            return word
-        }.joined(separator: " ")
+        return processedLines.joined(separator: "\n")
     }
     
     private func hideAllWords(_ text: String) -> String {
-        let words = text.components(separatedBy: .whitespacesAndNewlines)
-        return words.map { word in
-            let (cleanWord, punctuation) = separateWordFromPunctuation(word)
-            if cleanWord.isEmpty || cleanWord.count <= 2 {
-                return word
-            }
-            let underlines = String(repeating: "_", count: cleanWord.count)
-            return underlines + punctuation
-        }.joined(separator: " ")
+        let lines = text.components(separatedBy: .newlines)
+        let processedLines = lines.map { line in
+            let words = line.components(separatedBy: .whitespaces)
+            return words.map { word in
+                let (cleanWord, punctuation) = separateWordFromPunctuation(word)
+                if cleanWord.isEmpty || cleanWord.count <= 2 {
+                    return word
+                }
+                let underlines = String(repeating: "_", count: cleanWord.count)
+                return underlines + punctuation
+            }.joined(separator: " ")
+        }
+        return processedLines.joined(separator: "\n")
     }
     
     private func separateWordFromPunctuation(_ word: String) -> (word: String, punctuation: String) {

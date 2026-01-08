@@ -49,7 +49,7 @@ struct ContentView: View {
                     
                     Divider()
                 }
-                .background(Color.staticMeletaoSurface)
+                .background(Color(.windowBackgroundColor))
                 
                 // Content area - full screen
                 Group {
@@ -69,14 +69,14 @@ struct ContentView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.staticMeletaoBackground)
+                .background(Color(.windowBackgroundColor))
             }
             .navigationDestination(for: Poem.self) { poem in
                 MemorizationView(poem: poem)
             }
         }
         .frame(minWidth: 800, minHeight: 600)
-        .background(Color.staticMeletaoBackground)
+        .background(Color(.windowBackgroundColor))
     }
 }
 

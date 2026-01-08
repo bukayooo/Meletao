@@ -41,7 +41,7 @@ struct PoemDetailView: View {
                         }
                         .buttonStyle(.borderedProminent)
                     } else {
-                        NavigationLink("Study", destination: MemorizationView(poem: poem))
+                        NavigationLink("Study", value: poem)
                             .buttonStyle(.borderedProminent)
                         
                         Button("Remove") {
