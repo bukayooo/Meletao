@@ -56,7 +56,7 @@ extension Color {
     static let staticMeletaoPrimary = Color(nsColor: NSColor(name: nil, dynamicProvider: { appearance in
         switch appearance.name {
         case .darkAqua, .vibrantDark, .accessibilityHighContrastDarkAqua, .accessibilityHighContrastVibrantDark:
-            return NSColor(red: 0.45, green: 0.75, blue: 0.7, alpha: 1.0)
+            return NSColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0) // Grey in dark mode
         default:
             return NSColor(red: 0.4, green: 0.7, blue: 0.65, alpha: 1.0)
         }
@@ -106,7 +106,7 @@ extension Color {
     static let staticMeletaoCardBackground = Color(nsColor: NSColor(name: nil, dynamicProvider: { appearance in
         switch appearance.name {
         case .darkAqua, .vibrantDark, .accessibilityHighContrastDarkAqua, .accessibilityHighContrastVibrantDark:
-            return NSColor(red: 0.42, green: 0.72, blue: 0.67, alpha: 1.0) // Lighter than surface
+            return NSColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0) // Grey in dark mode
         default:
             return NSColor(red: 0.99, green: 0.98, blue: 0.96, alpha: 1.0)
         }

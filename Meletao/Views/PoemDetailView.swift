@@ -7,6 +7,7 @@ struct PoemDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showingAlert = false
     @State private var showingEditSheet = false
+    @State private var shouldNavigateToStudy = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -41,8 +42,10 @@ struct PoemDetailView: View {
                         }
                         .buttonStyle(.borderedProminent)
                     } else {
-                        NavigationLink("Study", value: poem)
-                            .buttonStyle(.borderedProminent)
+                        Button("Study") {
+                            shouldNavigateToStudy = true
+                        }
+                        .buttonStyle(.borderedProminent)
                         
                         Button("Remove") {
                             showingAlert = true
@@ -126,6 +129,11 @@ struct PoemDetailView: View {
         .frame(minWidth: 600, minHeight: 500)
         .sheet(isPresented: $showingEditSheet) {
             AddPoemView(poemToEdit: poem)
+        }
+        .fullScreenCover(isPresented: $shouldNavigateToStudy) {
+            NavigationStack {
+                MemorizationView(poem: poem)
+            }
         }
         .alert("Remove from Library", isPresented: $showingAlert) {
             Button("Cancel", role: .cancel) { }
