@@ -106,9 +106,9 @@ extension Color {
     static let staticMeletaoCardBackground = Color(nsColor: NSColor(name: nil, dynamicProvider: { appearance in
         switch appearance.name {
         case .darkAqua, .vibrantDark, .accessibilityHighContrastDarkAqua, .accessibilityHighContrastVibrantDark:
-            return NSColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0) // Grey in dark mode
+            return NSColor(red: 0.99, green: 0.98, blue: 0.96, alpha: 1.0) // Off-white in dark mode
         default:
-            return NSColor(red: 0.99, green: 0.98, blue: 0.96, alpha: 1.0)
+            return NSColor.controlBackgroundColor // Same grey as dropdowns in light mode
         }
     }))
 }
