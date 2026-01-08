@@ -87,12 +87,8 @@ extension Poem {
         "Speech",
         "Song Lyrics",
         "Prayer",
-        "Quote",
-        "Essay",
         "Letter",
         "Monologue",
-        "Philosophy",
-        "Literature"
     ]
     
     static let availableTags = [
@@ -124,9 +120,10 @@ extension Poem {
         "Beauty", "Truth", "Justice", "Freedom", "Liberty", "Democracy",
         "Honor", "Duty", "Sacrifice", "Heroism", "Patriotism", "War", "Peace",
         "Philosophy", "Knowledge", "Learning", "Education", "Art", "Creativity",
+        "Masculinity", "Femininity",
         
         // Social Issues
-        "Equality", "Social Justice", "Poverty", "Wealth", "Work", "Labor",
+        "Poverty", "Wealth", "Work",
         "Politics", "Government", "History", "Culture", "Tradition", "Progress",
         
         // Personal Growth
