@@ -27,9 +27,37 @@ class SpacedRepetitionService {
         let reviewCount = Int(poem.memorizationSessionsArray.count)
         session.reviewCount = Int32(reviewCount + 1)
         
-        let intervalIndex = min(reviewCount, intervals.count - 1)
-        let interval = intervals[intervalIndex]
-        session.nextReviewDate = Date().addingTimeInterval(interval)
+        // Check if this was an overdue review and adjust schedule accordingly
+        let daysMissed = getDaysMissed(for: poem)
+        let adjustedInterval = calculateAdjustedInterval(reviewCount: reviewCount, daysMissed: daysMissed)
+        
+        session.nextReviewDate = Date().addingTimeInterval(adjustedInterval)
+    }
+    
+    private func getDaysMissed(for poem: Poem) -> Int {
+        guard let lastReviewDate = poem.nextReviewDate else { return 0 }
+        let daysMissed = Calendar.current.dateComponents([.day], from: lastReviewDate, to: Date()).day ?? 0
+        return max(0, daysMissed)
+    }
+    
+    private func calculateAdjustedInterval(reviewCount: Int, daysMissed: Int) -> TimeInterval {
+        let baseIntervalIndex = min(reviewCount, intervals.count - 1)
+        let baseInterval = intervals[baseIntervalIndex]
+        
+        if daysMissed == 0 {
+            return baseInterval
+        }
+        
+        // Apply spaced repetition principle: if review was missed, reduce the next interval
+        // This follows the forgetting curve - missed reviews indicate weaker retention
+        let missedDaysPenalty = Double(daysMissed) * 0.2 // 20% reduction per missed day
+        let reductionFactor = max(0.3, 1.0 - missedDaysPenalty) // Minimum 30% of original interval
+        
+        // Calculate adjusted interval
+        let adjustedInterval = baseInterval * reductionFactor
+        
+        // Ensure minimum interval of 1 day
+        return max(24 * 60 * 60, adjustedInterval)
     }
     
     func getPoemsForReview(context: NSManagedObjectContext) -> [Poem] {
@@ -46,6 +74,23 @@ class SpacedRepetitionService {
             }
         } catch {
             print("Error fetching poems for review: \(error)")
+            return []
+        }
+    }
+    
+    func getOverduePoems(context: NSManagedObjectContext) -> [Poem] {
+        let request: NSFetchRequest<Poem> = Poem.fetchRequest()
+        request.predicate = NSPredicate(format: "isInLibrary == true")
+        
+        do {
+            let poems = try context.fetch(request)
+            return poems.filter { poem in
+                guard let nextReview = poem.nextReviewDate else { return false }
+                let daysMissed = Calendar.current.dateComponents([.day], from: nextReview, to: Date()).day ?? 0
+                return daysMissed > 0
+            }
+        } catch {
+            print("Error fetching overdue poems: \(error)")
             return []
         }
     }

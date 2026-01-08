@@ -31,6 +31,7 @@ struct MeletaoApp: App {
     private func scheduleInitialNotifications() {
         let context = persistenceController.container.viewContext
         NotificationService.shared.scheduleReviewNotifications(context: context)
+        NotificationService.shared.scheduleDailyNotificationRefresh(context: context)
         CalendarService.shared.addReviewEventsToCalendar(context: context)
     }
 }
