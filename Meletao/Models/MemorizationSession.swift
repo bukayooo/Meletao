@@ -8,8 +8,8 @@ public class MemorizationSession: NSManagedObject {
     }
     
     @NSManaged public var id: UUID
-    @NSManaged public var date: Date
-    @NSManaged public var nextReviewDate: Date
+    @NSManaged public var date: Date?
+    @NSManaged public var nextReviewDate: Date?
     @NSManaged public var reviewCount: Int32
     @NSManaged public var isCompleted: Bool
     @NSManaged public var poem: Poem?

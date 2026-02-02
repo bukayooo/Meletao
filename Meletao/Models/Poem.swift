@@ -56,7 +56,7 @@ extension Poem: Identifiable {
     
     var memorizationSessionsArray: [MemorizationSession] {
         let set = memorizationSessions as? Set<MemorizationSession> ?? []
-        return set.sorted { $0.date > $1.date }
+        return set.sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
     }
     
     var nextReviewDate: Date? {
