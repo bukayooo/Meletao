@@ -15,10 +15,15 @@ struct MemorizationView: View {
     private let stages = [
         "Read and recite this section out loud 3 times",
         "Fill in the missing words (first letters shown)",
-        "Fill in more missing words", 
+        "Fill in more missing words",
         "Fill in even more missing words",
         "Complete the section from memory"
     ]
+
+    // After 2+ prior review sessions the early stages are too easy — start at stage 4 (second to last)
+    private var defaultStartingStage: Int {
+        poem.memorizationSessionsArray.count >= 2 ? 3 : 0
+    }
     
     var currentSection: PoemSection? {
         let sections = poem.sectionsArray
@@ -34,7 +39,7 @@ struct MemorizationView: View {
         VStack(spacing: 0) {
             // Header with close button
             HStack {
-                Text(poem.title)
+                Text("\(poem.title)\u{2014}\(poem.author)")
                     .font(.title2)
                     .fontWeight(.semibold)
 
@@ -65,6 +70,9 @@ struct MemorizationView: View {
                 }
             }
             .padding()
+        }
+        .onAppear {
+            currentStage = defaultStartingStage
         }
         .background(Color(.windowBackgroundColor))
         .alert("Memorization Complete!", isPresented: $showingCompletionAlert) {
@@ -122,8 +130,14 @@ struct MemorizationView: View {
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.large)
+
+                    Button("From Start") {
+                        resetToFirstStage()
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
                 }
-                
+
                 Button(nextButtonTitle) {
                     nextStage()
                 }
@@ -369,13 +383,18 @@ struct MemorizationView: View {
                 currentSectionIndex += 1
             } else {
                 currentSectionIndex += 1
-                currentStage = 0
+                currentStage = defaultStartingStage
             }
         }
-        
+
         // Clear caches when advancing to ensure fresh content
         let textCacheKey = "section-\(currentSectionIndex)-\(currentStage)"
         processedTextCache.removeValue(forKey: textCacheKey)
+    }
+
+    private func resetToFirstStage() {
+        currentStage = 0
+        processedTextCache.removeValue(forKey: "section-\(currentSectionIndex)-0")
     }
     
     private func completeMemorization() {

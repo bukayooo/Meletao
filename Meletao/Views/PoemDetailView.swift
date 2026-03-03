@@ -5,9 +5,9 @@ struct PoemDetailView: View {
     let isInCatalog: Bool
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
+    var onStudy: (() -> Void)? = nil
     @State private var showingAlert = false
     @State private var showingEditSheet = false
-    @State private var shouldNavigateToStudy = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -43,7 +43,8 @@ struct PoemDetailView: View {
                         .buttonStyle(.borderedProminent)
                     } else {
                         Button("Study") {
-                            shouldNavigateToStudy = true
+                            dismiss()
+                            onStudy?()
                         }
                         .buttonStyle(.borderedProminent)
                         
@@ -129,11 +130,6 @@ struct PoemDetailView: View {
         .frame(minWidth: 600, minHeight: 500)
         .sheet(isPresented: $showingEditSheet) {
             AddPoemView(poemToEdit: poem)
-        }
-        .sheet(isPresented: $shouldNavigateToStudy) {
-            MemorizationView(poem: poem)
-                .frame(minWidth: 1000, minHeight: 800)
-                .interactiveDismissDisabled(false)
         }
         .alert("Remove from Library", isPresented: $showingAlert) {
             Button("Cancel", role: .cancel) { }

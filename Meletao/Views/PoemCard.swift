@@ -6,6 +6,7 @@ struct PoemCard: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var showingAlert = false
     @State private var showingDetail = false
+    @State private var navigateToStudy = false
     
     var body: some View {
         Button(action: {
@@ -88,10 +89,17 @@ struct PoemCard: View {
                         .controlSize(.small)
                         .onTapGesture { }
                     } else {
-                        NavigationLink("Study", value: poem)
-                            .buttonStyle(.borderedProminent)
-                            .tint(Color.staticMeletaoPrimary)
-                            .controlSize(.small)
+                        Button("Study") {
+                            navigateToStudy = true
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color.staticMeletaoPrimary)
+                        .controlSize(.small)
+                        // Hidden programmatic navigation trigger used by both the card button
+                        // and the detail view's Study button (via the onStudy callback)
+                        NavigationLink(destination: MemorizationView(poem: poem), isActive: $navigateToStudy) { EmptyView() }
+                            .frame(width: 0, height: 0)
+                            .hidden()
                         
                         Button("Remove") {
                             showingAlert = true
@@ -117,7 +125,12 @@ struct PoemCard: View {
         }
         .buttonStyle(.plain)
         .sheet(isPresented: $showingDetail) {
-            PoemDetailView(poem: poem, isInCatalog: isInCatalog)
+            PoemDetailView(poem: poem, isInCatalog: isInCatalog, onStudy: {
+                // Small delay lets the sheet dismiss animation finish before navigating
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    navigateToStudy = true
+                }
+            })
         }
         .alert("Remove from Library", isPresented: $showingAlert) {
             Button("Cancel", role: .cancel) { }
