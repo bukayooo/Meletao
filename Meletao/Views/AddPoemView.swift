@@ -116,30 +116,32 @@ struct AddPoemView: View {
                         }
                         .buttonStyle(.bordered)
                         .popover(isPresented: $showingTagPicker, arrowEdge: .bottom) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                ForEach(Poem.availableTags, id: \.self) { tag in
-                                    Button(action: {
-                                        if selectedTags.contains(tag) {
-                                            selectedTags.remove(tag)
-                                        } else {
-                                            selectedTags.insert(tag)
+                            ScrollView {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    ForEach(Poem.availableTags, id: \.self) { tag in
+                                        Button(action: {
+                                            if selectedTags.contains(tag) {
+                                                selectedTags.remove(tag)
+                                            } else {
+                                                selectedTags.insert(tag)
+                                            }
+                                        }) {
+                                            HStack {
+                                                Image(systemName: selectedTags.contains(tag) ? "checkmark.square.fill" : "square")
+                                                    .foregroundColor(selectedTags.contains(tag) ? .blue : .secondary)
+                                                Text(tag)
+                                                Spacer()
+                                            }
+                                            .contentShape(Rectangle())
                                         }
-                                    }) {
-                                        HStack {
-                                            Image(systemName: selectedTags.contains(tag) ? "checkmark.square.fill" : "square")
-                                                .foregroundColor(selectedTags.contains(tag) ? .blue : .secondary)
-                                            Text(tag)
-                                            Spacer()
-                                        }
-                                        .contentShape(Rectangle())
+                                        .buttonStyle(.plain)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
                                     }
-                                    .buttonStyle(.plain)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
                                 }
+                                .padding(.vertical, 8)
                             }
-                            .padding(.vertical, 8)
-                            .frame(minWidth: 160)
+                            .frame(minWidth: 160, maxHeight: 300)
                         }
                         .frame(maxWidth: 150, alignment: .leading)
                     }

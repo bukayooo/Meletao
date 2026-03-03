@@ -11,6 +11,9 @@ struct LibraryView: View {
     
     @State private var searchText = ""
     @State private var selectedFilter: FilterType = .all
+    // Forces the view to re-render every minute so shouldReview re-evaluates as time passes
+    @State private var now = Date()
+    let refreshTimer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     enum FilterType: String, CaseIterable {
         case all = "All"
@@ -96,6 +99,9 @@ struct LibraryView: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
                 // Refresh is automatic due to @FetchRequest, but this ensures immediate update
+            }
+            .onReceive(refreshTimer) { date in
+                now = date
             }
     }
 }

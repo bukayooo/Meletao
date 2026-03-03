@@ -5,7 +5,9 @@ import EventKit
 @main
 struct MeletaoApp: App {
     let persistenceController = PersistenceController.shared
-    
+    // Fires every 5 minutes to keep the dock badge current while the app is running
+    let badgeTimer = Timer.publish(every: 300, on: .main, in: .common).autoconnect()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -16,7 +18,10 @@ struct MeletaoApp: App {
                     scheduleInitialNotifications()
                 }
                 .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-                    // Update badge when app becomes active
+                    let context = persistenceController.container.viewContext
+                    NotificationService.shared.updateAppBadge(context: context)
+                }
+                .onReceive(badgeTimer) { _ in
                     let context = persistenceController.container.viewContext
                     NotificationService.shared.updateAppBadge(context: context)
                 }

@@ -10,18 +10,31 @@ class NotificationService {
     
     func scheduleReviewNotifications(context: NSManagedObjectContext) {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-        
+
         let reviewDates = SpacedRepetitionService.shared.getUpcomingReviewDates(context: context)
         let overduePoems = SpacedRepetitionService.shared.getOverduePoems(context: context)
-        
-        // Schedule notifications for upcoming reviews
-        for date in reviewDates.prefix(60) { // Leave some room for overdue notifications
-            scheduleNotification(for: date, context: context)
+
+        // Group upcoming review dates by calendar day so we send exactly one
+        // notification per day (not one per poem), with an accurate count.
+        let calendar = Calendar.current
+        var countsByDay: [String: (components: DateComponents, count: Int)] = [:]
+        for date in reviewDates {
+            let comps = calendar.dateComponents([.year, .month, .day], from: date)
+            let key = "\(comps.year ?? 0)-\(comps.month ?? 0)-\(comps.day ?? 0)"
+            if let existing = countsByDay[key] {
+                countsByDay[key] = (existing.components, existing.count + 1)
+            } else {
+                countsByDay[key] = (comps, 1)
+            }
         }
-        
+
+        for (_, dayInfo) in countsByDay.prefix(60) {
+            scheduleNotification(forDay: dayInfo.components, count: dayInfo.count)
+        }
+
         // Schedule persistent reminders for overdue poems
         scheduleOverdueReminders(for: overduePoems, context: context)
-        
+
         // Update app badge with current review count
         updateAppBadge(context: context)
     }
@@ -35,29 +48,23 @@ class NotificationService {
         }
     }
     
-    private func scheduleNotification(for date: Date, context: NSManagedObjectContext) {
+    private func scheduleNotification(forDay dateComponents: DateComponents, count: Int) {
         let content = UNMutableNotificationContent()
         content.title = "Review Time"
-        
-        let poemsCount = SpacedRepetitionService.shared.getPoemsForReview(context: context).count
-        if poemsCount == 1 {
-            content.body = "You have 1 poem ready for review"
-        } else {
-            content.body = "You have \(poemsCount) poems ready for review"
-        }
-        
+        content.body = count == 1 ? "You have 1 poem ready for review" : "You have \(count) poems ready for review"
         content.sound = .default
         content.categoryIdentifier = "REVIEW_REMINDER"
-        
-        var dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: date)
-        dateComponents.hour = 19 // 7 PM
-        dateComponents.minute = 0
-        
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
-        
-        let identifier = "review_\(date.timeIntervalSince1970)"
+
+        var triggerComponents = dateComponents
+        triggerComponents.hour = 19 // 7 PM
+        triggerComponents.minute = 0
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerComponents, repeats: false)
+
+        // Use the calendar day as the identifier so duplicate scheduling is impossible
+        let identifier = "review_\(dateComponents.year ?? 0)_\(dateComponents.month ?? 0)_\(dateComponents.day ?? 0)"
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-        
+
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
                 print("Error scheduling notification: \(error)")
