@@ -15,6 +15,7 @@ struct AddPoemView: View {
     @State private var selectedTags: Set<String> = []
     @State private var showingAlert = false
     @State private var alertMessage = ""
+    @State private var showingTagPicker = false
     
     init(poemToEdit: Poem? = nil) {
         self.poemToEdit = poemToEdit
@@ -106,20 +107,39 @@ struct AddPoemView: View {
                             }
                         }
                         
-                        Menu("Add Tags") {
-                            ForEach(Poem.availableTags, id: \.self) { tag in
-                                Button(action: {
-                                    selectedTags.insert(tag)
-                                }) {
-                                    HStack {
-                                        Text(tag)
-                                        if selectedTags.contains(tag) {
-                                            Image(systemName: "checkmark")
-                                        }
-                                    }
-                                }
-                                .disabled(selectedTags.contains(tag))
+                        Button(action: { showingTagPicker.toggle() }) {
+                            HStack(spacing: 4) {
+                                Text("Add Tags")
+                                Image(systemName: "chevron.down")
+                                    .font(.caption)
                             }
+                        }
+                        .buttonStyle(.bordered)
+                        .popover(isPresented: $showingTagPicker, arrowEdge: .bottom) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                ForEach(Poem.availableTags, id: \.self) { tag in
+                                    Button(action: {
+                                        if selectedTags.contains(tag) {
+                                            selectedTags.remove(tag)
+                                        } else {
+                                            selectedTags.insert(tag)
+                                        }
+                                    }) {
+                                        HStack {
+                                            Image(systemName: selectedTags.contains(tag) ? "checkmark.square.fill" : "square")
+                                                .foregroundColor(selectedTags.contains(tag) ? .blue : .secondary)
+                                            Text(tag)
+                                            Spacer()
+                                        }
+                                        .contentShape(Rectangle())
+                                    }
+                                    .buttonStyle(.plain)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                }
+                            }
+                            .padding(.vertical, 8)
+                            .frame(minWidth: 160)
                         }
                         .frame(maxWidth: 150, alignment: .leading)
                     }
