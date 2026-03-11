@@ -31,7 +31,10 @@ class SpacedRepetitionService {
         let daysMissed = getDaysMissed(for: poem)
         let adjustedInterval = calculateAdjustedInterval(reviewCount: reviewCount, daysMissed: daysMissed)
         
-        session.nextReviewDate = Date().addingTimeInterval(adjustedInterval)
+        // Normalize to start of day so a poem is ready for review all day,
+        // not just after the specific hour it was last reviewed.
+        let targetDate = Date().addingTimeInterval(adjustedInterval)
+        session.nextReviewDate = Calendar.current.startOfDay(for: targetDate)
     }
     
     private func getDaysMissed(for poem: Poem) -> Int {

@@ -5,10 +5,23 @@ import AppKit
 
 class NotificationService {
     static let shared = NotificationService()
-    
+
     private init() {}
-    
+
+    // Debounce token — cancels any pending reschedule before issuing a new one,
+    // preventing race conditions when multiple events trigger rescheduling rapidly.
+    private var rescheduleWorkItem: DispatchWorkItem?
+
     func scheduleReviewNotifications(context: NSManagedObjectContext) {
+        rescheduleWorkItem?.cancel()
+        let workItem = DispatchWorkItem { [weak self] in
+            self?.performScheduleReviewNotifications(context: context)
+        }
+        rescheduleWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: workItem)
+    }
+
+    private func performScheduleReviewNotifications(context: NSManagedObjectContext) {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
 
         let reviewDates = SpacedRepetitionService.shared.getUpcomingReviewDates(context: context)
@@ -114,8 +127,9 @@ class NotificationService {
         dateComponents.minute = 0
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
-        
-        let identifier = "overdue_\(poem.id.uuidString)_\(date.timeIntervalSince1970)"
+
+        // Use a stable day-based identifier so re-scheduling replaces rather than duplicates.
+        let identifier = "overdue_\(poem.id.uuidString)_\(dateComponents.year ?? 0)_\(dateComponents.month ?? 0)_\(dateComponents.day ?? 0)"
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         
         UNUserNotificationCenter.current().add(request) { error in
@@ -126,9 +140,7 @@ class NotificationService {
     }
     
     func updateNotificationsAfterMemorization(context: NSManagedObjectContext) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.scheduleReviewNotifications(context: context)
-        }
+        scheduleReviewNotifications(context: context)
     }
     
     func scheduleDailyNotificationRefresh(context: NSManagedObjectContext) {
@@ -140,7 +152,7 @@ class NotificationService {
         content.categoryIdentifier = "DAILY_REFRESH"
         
         var dateComponents = DateComponents()
-        dateComponents.hour = 8 // 8 AM daily refresh
+        dateComponents.hour = 5 // 5 AM daily refresh — before the user's morning check
         dateComponents.minute = 0
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)

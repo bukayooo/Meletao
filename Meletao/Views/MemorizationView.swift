@@ -13,11 +13,11 @@ struct MemorizationView: View {
     @State private var processedTextCache: [String: String] = [:]
     
     private let stages = [
-        "Read and recite this section out loud 3 times",
-        "Fill in the missing words (first letters shown)",
-        "Fill in more missing words",
-        "Fill in even more missing words",
-        "Complete the section from memory"
+        "Read and recite this section out loud at least 3 times.",
+        "Fill in the missing words (first letters shown).",
+        "Fill in more missing words.",
+        "Fill in even more missing words.",
+        "Complete the section from memory."
     ]
 
     // After 2+ prior review sessions the early stages are too easy — start at stage 4 (second to last)
@@ -96,16 +96,16 @@ struct MemorizationView: View {
                 .font(.headline)
                 .foregroundColor(.secondary)
             
-            Text("Stage \(currentStage + 1): \(stages[currentStage])")
+            Text("Stage \(currentStage + 1): \(stageDescription(for: currentStage))")
                 .font(.subheadline)
                 .foregroundColor(Color.staticMeletaoPrimary)
                 .padding(.horizontal)
                 .multilineTextAlignment(.center)
-            
+
             ScrollView {
                 VStack(spacing: 16) {
                     if currentSectionIndex > 0 {
-                        previousSectionsView
+                        previousContextView
                     }
                     
                     Text(processedSectionText(section))
@@ -114,9 +114,9 @@ struct MemorizationView: View {
                         .padding()
                         .background(Color.staticMeletaoCardBackground)
                         .cornerRadius(12)
-                        .multilineTextAlignment(.leading)
+                        .multilineTextAlignment(.center)
                         .lineLimit(nil)
-                        .fixedSize(horizontal: false, vertical: true)
+                        .fixedSize(horizontal: true, vertical: true)
                 }
                 .padding(.horizontal)
             }
@@ -155,7 +155,7 @@ struct MemorizationView: View {
                 .font(.title)
                 .foregroundColor(Color.staticMeletaoPrimary)
             
-            Text("Recite the complete poem 3 times using only these hints:")
+            Text("Recite the complete poem at least 3 times using only these hints:")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -174,15 +174,77 @@ struct MemorizationView: View {
             
             Spacer()
             
-            Button("Complete Memorization") {
-                showingCompletionAlert = true
+            HStack(spacing: 16) {
+                Button("Struggling? Go back to last section") {
+                    isShowingFullPoem = false
+                    currentSectionIndex = poem.sectionsArray.count - 1
+                    currentStage = 0
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+
+                Button("Complete Memorization") {
+                    showingCompletionAlert = true
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(Color.staticMeletaoAccent)
+                .controlSize(.large)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(Color.staticMeletaoAccent)
-            .controlSize(.large)
         }
     }
     
+    private func stageDescription(for stage: Int) -> String {
+        var text = stages[stage]
+        guard currentSectionIndex > 0 else { return text }
+        if stage == 0 {
+            text += " In order to place this memorization chunk in context with the previous sections in your memory, each time recite all the previous sections from memory, then read the current section."
+        } else if stage == 1 {
+            text += " In order to place this memorization chunk in context with the previous sections in your memory, each time recite the last line of the previous section from memory, then move onto the current section"
+        }
+        return text
+    }
+
+    @ViewBuilder
+    private var previousContextView: some View {
+        if currentStage == 0 {
+            previousSectionsView
+        } else {
+            let previousSection = poem.sectionsArray[currentSectionIndex - 1]
+            let lastLine = previousSection.text
+                .components(separatedBy: .newlines)
+                .filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+                .last ?? ""
+            if !lastLine.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("Section \(currentSectionIndex)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Spacer(minLength: 16)
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                    }
+                    Text("...\(lastLine)")
+                        .font(.footnote)
+                        .lineSpacing(4)
+                        .foregroundColor(.secondary)
+                        .opacity(0.5)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(nil)
+                }
+                .fixedSize(horizontal: true, vertical: true)
+                .padding()
+                .background(Color.staticMeletaoCardBackground.opacity(0.5))
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
+                )
+            }
+        }
+    }
+
     @ViewBuilder
     private var previousSectionsView: some View {
         VStack(spacing: 12) {
@@ -193,21 +255,21 @@ struct MemorizationView: View {
                         Text("Section \(index + 1)")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Spacer()
+                        Spacer(minLength: 16)
                         Image(systemName: "checkmark.circle.fill")
                             .font(.caption)
                             .foregroundColor(.green)
                     }
-                    
+
                     Text(previousSection.text)
                         .font(.footnote)
                         .lineSpacing(4)
                         .foregroundColor(.secondary)
                         .opacity(0.7)
-                        .multilineTextAlignment(.leading)
+                        .multilineTextAlignment(.center)
                         .lineLimit(nil)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
+                .fixedSize(horizontal: true, vertical: true)
                 .padding()
                 .background(Color.staticMeletaoCardBackground.opacity(0.5))
                 .cornerRadius(8)
