@@ -69,11 +69,15 @@ class SpacedRepetitionService {
         
         do {
             let poems = try context.fetch(request)
+            let todayStart = Calendar.current.startOfDay(for: Date())
             return poems.filter { poem in
                 guard let nextReview = poem.nextReviewDate else {
                     return true
                 }
-                return Date() >= nextReview
+                // Compare start-of-day so poems reviewed in the evening are
+                // still available the following morning, regardless of what
+                // hour the nextReviewDate timestamp was stored at.
+                return todayStart >= Calendar.current.startOfDay(for: nextReview)
             }
         } catch {
             print("Error fetching poems for review: \(error)")
