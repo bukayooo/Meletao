@@ -97,10 +97,17 @@ struct ReviewCard: View {
                     .foregroundColor(.secondary)
             }
             
-            NavigationLink("Start Review", value: poem)
-                .buttonStyle(.borderedProminent)
-                .tint(Color.staticMeletaoPrimary)
-                .controlSize(.small)
+            if poem.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                NavigationLink("Start Review", value: poem)
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color.staticMeletaoPrimary)
+                    .controlSize(.small)
+            } else {
+                NavigationLink("Start Review", value: PoemForNotesReview(poem: poem))
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color.staticMeletaoPrimary)
+                    .controlSize(.small)
+            }
         }
         .padding()
         .frame(width: 350, height: 200) // Fixed card size

@@ -7,6 +7,7 @@ struct PoemCard: View {
     @State private var showingAlert = false
     @State private var showingDetail = false
     @State private var navigateToStudy = false
+    @State private var navigateToNotes = false
     
     var body: some View {
         Button(action: {
@@ -90,14 +91,19 @@ struct PoemCard: View {
                         .onTapGesture { }
                     } else {
                         Button("Study") {
-                            navigateToStudy = true
+                            if poem.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                navigateToStudy = true
+                            } else {
+                                navigateToNotes = true
+                            }
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(Color.staticMeletaoPrimary)
                         .controlSize(.small)
-                        // Hidden programmatic navigation trigger used by both the card button
-                        // and the detail view's Study button (via the onStudy callback)
                         NavigationLink(destination: MemorizationView(poem: poem), isActive: $navigateToStudy) { EmptyView() }
+                            .frame(width: 0, height: 0)
+                            .hidden()
+                        NavigationLink(destination: PoemNotesBeforeReviewView(poem: poem), isActive: $navigateToNotes) { EmptyView() }
                             .frame(width: 0, height: 0)
                             .hidden()
                         
@@ -126,9 +132,12 @@ struct PoemCard: View {
         .buttonStyle(.plain)
         .sheet(isPresented: $showingDetail) {
             PoemDetailView(poem: poem, isInCatalog: isInCatalog, onStudy: {
-                // Small delay lets the sheet dismiss animation finish before navigating
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    navigateToStudy = true
+                    if poem.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        navigateToStudy = true
+                    } else {
+                        navigateToNotes = true
+                    }
                 }
             })
         }

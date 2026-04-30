@@ -74,6 +74,9 @@ struct ContentView: View {
             .navigationDestination(for: Poem.self) { poem in
                 MemorizationView(poem: poem)
             }
+            .navigationDestination(for: PoemForNotesReview.self) { wrapper in
+                PoemNotesBeforeReviewView(poem: wrapper.poem)
+            }
         }
         .frame(minWidth: 800, minHeight: 600)
         .background(Color(.windowBackgroundColor))

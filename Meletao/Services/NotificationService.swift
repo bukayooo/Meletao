@@ -50,6 +50,10 @@ class NotificationService {
 
         // Update app badge with current review count
         updateAppBadge(context: context)
+
+        // removeAllPendingNotificationRequests() above also removed the daily refresh
+        // notification. Re-add it so the 5 AM refresh persists across reschedule cycles.
+        scheduleDailyNotificationRefresh(context: context)
     }
     
     func updateAppBadge(context: NSManagedObjectContext) {
@@ -62,6 +66,7 @@ class NotificationService {
     }
     
     private func scheduleNotification(forDay dateComponents: DateComponents, count: Int) {
+        guard count > 0 else { return }
         let content = UNMutableNotificationContent()
         content.title = "Review Time"
         content.body = count == 1 ? "You have 1 poem ready for review" : "You have \(count) poems ready for review"
@@ -140,6 +145,24 @@ class NotificationService {
     }
     
     func updateNotificationsAfterMemorization(context: NSManagedObjectContext) {
+        // Immediately remove today's pending review notification without waiting for the
+        // debounce — if the app is backgrounded after memorization, the debounced work item
+        // may not run until after 7 PM, causing the notification to fire anyway.
+        let today = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+        let todayIdentifier = "review_\(today.year ?? 0)_\(today.month ?? 0)_\(today.day ?? 0)"
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [todayIdentifier])
+
+        // Clear delivered review notifications so stale counts (e.g. "0 poems ready for
+        // review") are removed from Notification Center after a poem is memorized.
+        UNUserNotificationCenter.current().getDeliveredNotifications { notifications in
+            let reviewIds = notifications
+                .filter { $0.request.identifier.hasPrefix("review_") }
+                .map { $0.request.identifier }
+            if !reviewIds.isEmpty {
+                UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: reviewIds)
+            }
+        }
+
         scheduleReviewNotifications(context: context)
     }
     
