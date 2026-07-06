@@ -8,6 +8,7 @@ struct PoemDetailView: View {
     var onStudy: (() -> Void)? = nil
     @State private var showingAlert = false
     @State private var showingEditSheet = false
+    @State private var showingDeleteAlert = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -26,6 +27,12 @@ struct PoemDetailView: View {
                 Spacer()
                 
                 HStack(spacing: 12) {
+                    Button("Delete") {
+                        showingDeleteAlert = true
+                    }
+                    .buttonStyle(.bordered)
+                    .foregroundColor(.red)
+
                     Button("Edit") {
                         showingEditSheet = true
                     }
@@ -140,8 +147,30 @@ struct PoemDetailView: View {
         } message: {
             Text("Are you sure you want to remove this poem from your library?")
         }
+        .alert("Delete Poem", isPresented: $showingDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    deletePoem()
+                }
+            }
+        } message: {
+            Text("Are you sure you want to permanently delete \"\(poem.title)\"? This cannot be undone.")
+        }
     }
-    
+
+    private func deletePoem() {
+        viewContext.delete(poem)
+
+        do {
+            try viewContext.save()
+            NotificationService.shared.updateAppBadge(context: viewContext)
+        } catch {
+            print("Error deleting poem: \(error)")
+        }
+    }
+
     private func addToLibrary() {
         poem.isInLibrary = true
         
