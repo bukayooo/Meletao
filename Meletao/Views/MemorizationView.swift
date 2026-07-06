@@ -4,6 +4,7 @@ struct MemorizationView: View {
     let poem: Poem
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var navigationCoordinator: NavigationCoordinator
     
     @State private var currentSectionIndex = 0
     @State private var currentStage = 0
@@ -78,7 +79,7 @@ struct MemorizationView: View {
         .alert("Memorization Complete!", isPresented: $showingCompletionAlert) {
             Button("Finish") {
                 completeMemorization()
-                dismiss()
+                navigationCoordinator.popToRoot()
             }
         } message: {
             Text("Great job! You've completed memorizing this poem.")

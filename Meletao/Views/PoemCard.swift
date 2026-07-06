@@ -4,10 +4,9 @@ struct PoemCard: View {
     let poem: Poem
     let isInCatalog: Bool
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject private var navigationCoordinator: NavigationCoordinator
     @State private var showingAlert = false
     @State private var showingDetail = false
-    @State private var navigateToStudy = false
-    @State private var navigateToNotes = false
     
     var body: some View {
         Button(action: {
@@ -91,22 +90,12 @@ struct PoemCard: View {
                         .onTapGesture { }
                     } else {
                         Button("Study") {
-                            if poem.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                navigateToStudy = true
-                            } else {
-                                navigateToNotes = true
-                            }
+                            startStudying()
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(Color.staticMeletaoPrimary)
                         .controlSize(.small)
-                        NavigationLink(destination: MemorizationView(poem: poem), isActive: $navigateToStudy) { EmptyView() }
-                            .frame(width: 0, height: 0)
-                            .hidden()
-                        NavigationLink(destination: PoemNotesBeforeReviewView(poem: poem), isActive: $navigateToNotes) { EmptyView() }
-                            .frame(width: 0, height: 0)
-                            .hidden()
-                        
+
                         Button("Remove") {
                             showingAlert = true
                         }
@@ -133,11 +122,7 @@ struct PoemCard: View {
         .sheet(isPresented: $showingDetail) {
             PoemDetailView(poem: poem, isInCatalog: isInCatalog, onStudy: {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    if poem.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        navigateToStudy = true
-                    } else {
-                        navigateToNotes = true
-                    }
+                    startStudying()
                 }
             })
         }
@@ -151,9 +136,17 @@ struct PoemCard: View {
         }
     }
     
+    private func startStudying() {
+        if poem.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            navigationCoordinator.path.append(poem)
+        } else {
+            navigationCoordinator.path.append(PoemForNotesReview(poem: poem))
+        }
+    }
+
     private func addToLibrary() {
         poem.isInLibrary = true
-        
+
         do {
             try viewContext.save()
             NotificationService.shared.updateAppBadge(context: viewContext)
@@ -161,7 +154,7 @@ struct PoemCard: View {
             print("Error adding poem to library: \(error)")
         }
     }
-    
+
     private func removeFromLibrary() {
         poem.isInLibrary = false
         

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab = 0
-    @State private var navigationPath = NavigationPath()
+    @StateObject private var navigationCoordinator = NavigationCoordinator()
     
     private var currentTitle: String {
         switch selectedTab {
@@ -14,7 +14,7 @@ struct ContentView: View {
     }
     
     var body: some View {
-        NavigationStack(path: $navigationPath) {
+        NavigationStack(path: $navigationCoordinator.path) {
             VStack(spacing: 0) {
                 // Custom header with title and tab buttons
                 VStack {
@@ -78,6 +78,7 @@ struct ContentView: View {
                 PoemNotesBeforeReviewView(poem: wrapper.poem)
             }
         }
+        .environmentObject(navigationCoordinator)
         .frame(minWidth: 800, minHeight: 600)
         .background(Color(.windowBackgroundColor))
     }
