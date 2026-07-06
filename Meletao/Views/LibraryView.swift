@@ -75,11 +75,19 @@ struct LibraryView: View {
                         Image(systemName: "heart.text.square")
                             .font(.system(size: 60))
                             .foregroundColor(Color.staticMeletaoSecondary)
-                        Text("Your library is empty")
-                            .font(.title2)
-                            .foregroundColor(.secondary)
-                        Text("Add poems from the catalog to start memorizing")
-                            .foregroundColor(.secondary)
+                        if poems.isEmpty {
+                            Text("Your library is empty")
+                                .font(.title2)
+                                .foregroundColor(.secondary)
+                            Text("Add poems from the catalog to start memorizing")
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("No poems match your filters")
+                                .font(.title2)
+                                .foregroundColor(.secondary)
+                            Text("Try a different search term or filter")
+                                .foregroundColor(.secondary)
+                        }
                     }
                     Spacer()
                 } else {

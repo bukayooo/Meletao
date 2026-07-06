@@ -127,11 +127,19 @@ struct CatalogView: View {
                         Image(systemName: "book.closed")
                             .font(.system(size: 60))
                             .foregroundColor(Color.staticMeletaoSecondary)
-                        Text("No poems in catalog")
-                            .font(.title2)
-                            .foregroundColor(.secondary)
-                        Text("Add your first poem to get started")
-                            .foregroundColor(.secondary)
+                        if poems.isEmpty {
+                            Text("No poems in catalog")
+                                .font(.title2)
+                                .foregroundColor(.secondary)
+                            Text("Add your first poem to get started")
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("No poems match your filters")
+                                .font(.title2)
+                                .foregroundColor(.secondary)
+                            Text("Try a different search term or clear your filters")
+                                .foregroundColor(.secondary)
+                        }
                     }
                     Spacer()
                 } else {
