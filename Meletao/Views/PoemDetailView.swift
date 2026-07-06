@@ -27,22 +27,24 @@ struct PoemDetailView: View {
                 Spacer()
                 
                 HStack(spacing: 12) {
-                    Button("Delete") {
-                        showingDeleteAlert = true
+                    if isInCatalog {
+                        Button("Delete") {
+                            showingDeleteAlert = true
+                        }
+                        .buttonStyle(.bordered)
+                        .foregroundColor(.red)
                     }
-                    .buttonStyle(.bordered)
-                    .foregroundColor(.red)
 
                     Button("Edit") {
                         showingEditSheet = true
                     }
                     .buttonStyle(.bordered)
-                    
+
                     Button("Close") {
                         dismiss()
                     }
                     .keyboardShortcut(.cancelAction)
-                    
+
                     if isInCatalog {
                         Button("Add to Library") {
                             addToLibrary()
@@ -54,9 +56,14 @@ struct PoemDetailView: View {
                             onStudy?()
                         }
                         .buttonStyle(.borderedProminent)
-                        
-                        Button("Remove") {
-                            showingAlert = true
+
+                        Menu("Remove") {
+                            Button("Remove from Library") {
+                                showingAlert = true
+                            }
+                            Button("Delete Permanently", role: .destructive) {
+                                showingDeleteAlert = true
+                            }
                         }
                         .buttonStyle(.bordered)
                         .foregroundColor(.red)

@@ -352,25 +352,21 @@ struct MemorizationView: View {
         let lines = text.components(separatedBy: .newlines)
         let processedLines = lines.map { line -> String in
             let words = line.components(separatedBy: .whitespaces)
-            let wordsToHide = Int(Double(words.count) * hideRatio)
+            // Only words longer than 1 character (after stripping punctuation) can be hidden.
+            // A line of pure punctuation (e.g. a "* * *" stanza divider) or single-letter
+            // words has zero eligible candidates, so cap the target at what's available.
+            let eligibleIndices = words.indices.filter { cleanWordForChecking(words[$0]).count > 1 }
+            let wordsToHide = min(Int(Double(words.count) * hideRatio), eligibleIndices.count)
             let cacheKey = "\(currentSectionIndex)-\(currentStage)-\(hideRatio)-\(line.hashValue)"
-            
+
             // Use cached indices if they exist
             let hiddenIndices: Set<Int>
             if let cached = hiddenIndicesCache[cacheKey] {
                 hiddenIndices = cached
             } else {
-                var newHiddenIndices = Set<Int>()
-                while newHiddenIndices.count < wordsToHide && newHiddenIndices.count < words.count {
-                    let randomIndex = Int.random(in: 0..<words.count)
-                    let word = words[randomIndex]
-                    let cleanWord = cleanWordForChecking(word)
-                    if !cleanWord.isEmpty && cleanWord.count > 1 {
-                        newHiddenIndices.insert(randomIndex)
-                    }
-                }
+                let newHiddenIndices = Set(eligibleIndices.shuffled().prefix(wordsToHide))
                 hiddenIndices = newHiddenIndices
-                
+
                 // Cache the result using a dispatch to avoid state mutation during view update
                 DispatchQueue.main.async {
                     self.hiddenIndicesCache[cacheKey] = hiddenIndices

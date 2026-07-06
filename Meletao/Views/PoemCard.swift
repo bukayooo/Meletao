@@ -7,6 +7,7 @@ struct PoemCard: View {
     @EnvironmentObject private var navigationCoordinator: NavigationCoordinator
     @State private var showingAlert = false
     @State private var showingDetail = false
+    @State private var showingDeleteAlert = false
     
     var body: some View {
         Button(action: {
@@ -96,8 +97,13 @@ struct PoemCard: View {
                         .tint(Color.staticMeletaoPrimary)
                         .controlSize(.small)
 
-                        Button("Remove") {
-                            showingAlert = true
+                        Menu("Remove") {
+                            Button("Remove from Library") {
+                                showingAlert = true
+                            }
+                            Button("Delete Permanently", role: .destructive) {
+                                showingDeleteAlert = true
+                            }
                         }
                         .buttonStyle(.bordered)
                         .controlSize(.small)
@@ -134,8 +140,16 @@ struct PoemCard: View {
         } message: {
             Text("Are you sure you want to remove this poem from your library?")
         }
+        .alert("Delete Poem", isPresented: $showingDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                deletePoem()
+            }
+        } message: {
+            Text("Are you sure you want to permanently delete \"\(poem.title)\"? This cannot be undone.")
+        }
     }
-    
+
     private func startStudying() {
         if poem.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             navigationCoordinator.path.append(poem)
@@ -157,12 +171,23 @@ struct PoemCard: View {
 
     private func removeFromLibrary() {
         poem.isInLibrary = false
-        
+
         do {
             try viewContext.save()
             NotificationService.shared.updateAppBadge(context: viewContext)
         } catch {
             print("Error removing poem from library: \(error)")
+        }
+    }
+
+    private func deletePoem() {
+        viewContext.delete(poem)
+
+        do {
+            try viewContext.save()
+            NotificationService.shared.updateAppBadge(context: viewContext)
+        } catch {
+            print("Error deleting poem: \(error)")
         }
     }
 }
