@@ -14,7 +14,7 @@ class SpacedRepetitionService {
         14 * 24 * 60 * 60, // 2 weeks
         30 * 24 * 60 * 60, // 1 month
         60 * 24 * 60 * 60, // 2 months
-        120 * 24 * 60 * 60 // 4 months
+        90 * 24 * 60 * 60  // 3 months (cap — interval stops growing beyond this)
     ]
     
     func scheduleNextReview(for poem: Poem, context: NSManagedObjectContext) {
