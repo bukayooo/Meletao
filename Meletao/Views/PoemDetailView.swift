@@ -69,6 +69,7 @@ struct PoemDetailView: View {
                         .foregroundColor(.red)
                     }
                 }
+                .layoutPriority(1)
             }
             .padding()
             .background(Color(.windowBackgroundColor))
