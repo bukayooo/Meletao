@@ -97,7 +97,7 @@ struct LibraryView: View {
                             GridItem(.fixed(350)),
                             GridItem(.fixed(350))
                         ], spacing: 50) {
-                            ForEach(filteredPoems, id: \.id) { poem in
+                            ForEach(filteredPoems, id: \.objectID) { poem in
                                 PoemCard(poem: poem, isInCatalog: false)
                             }
                         }

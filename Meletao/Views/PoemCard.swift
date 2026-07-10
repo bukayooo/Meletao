@@ -181,13 +181,18 @@ struct PoemCard: View {
     }
 
     private func deletePoem() {
-        viewContext.delete(poem)
+        // Deferred so the delete/save (which turns `poem` into a Core Data fault)
+        // doesn't happen synchronously while the confirmation alert's sheet is
+        // still animating closed and SwiftUI is mid-layout over the old data.
+        DispatchQueue.main.async {
+            viewContext.delete(poem)
 
-        do {
-            try viewContext.save()
-            NotificationService.shared.updateAppBadge(context: viewContext)
-        } catch {
-            print("Error deleting poem: \(error)")
+            do {
+                try viewContext.save()
+                NotificationService.shared.updateAppBadge(context: viewContext)
+            } catch {
+                print("Error deleting poem: \(error)")
+            }
         }
     }
 }
