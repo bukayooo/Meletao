@@ -351,7 +351,7 @@ struct MemorizationView: View {
     private func hideWordsWithFirstLetter(_ text: String, hideRatio: Double) -> String {
         let lines = text.components(separatedBy: .newlines)
         let processedLines = lines.map { line -> String in
-            let words = line.components(separatedBy: .whitespaces)
+            let (words, separators) = tokenizeLine(line)
             // Only words longer than 1 character (after stripping punctuation) can be hidden.
             // A line of pure punctuation (e.g. a "* * *" stanza divider) or single-letter
             // words has zero eligible candidates, so cap the target at what's available.
@@ -372,8 +372,8 @@ struct MemorizationView: View {
                     self.hiddenIndicesCache[cacheKey] = hiddenIndices
                 }
             }
-            
-            return words.enumerated().map { index, word in
+
+            let processedWords = words.enumerated().map { index, word -> String in
                 if hiddenIndices.contains(index) && !word.isEmpty {
                     let (cleanWord, punctuation) = separateWordFromPunctuation(word)
                     if cleanWord.count > 1 {
@@ -383,28 +383,63 @@ struct MemorizationView: View {
                     }
                 }
                 return word
-            }.joined(separator: " ")
+            }
+            return joinWords(processedWords, separators: separators)
         }
-        
+
         return processedLines.joined(separator: "\n")
     }
-    
+
     private func hideAllWords(_ text: String) -> String {
         let lines = text.components(separatedBy: .newlines)
-        let processedLines = lines.map { line in
-            let words = line.components(separatedBy: .whitespaces)
-            return words.map { word in
+        let processedLines = lines.map { line -> String in
+            let (words, separators) = tokenizeLine(line)
+            let processedWords = words.map { word -> String in
                 let (cleanWord, punctuation) = separateWordFromPunctuation(word)
                 if cleanWord.isEmpty || cleanWord.count <= 2 {
                     return word
                 }
                 let underlines = String(repeating: "_", count: cleanWord.count)
                 return underlines + punctuation
-            }.joined(separator: " ")
+            }
+            return joinWords(processedWords, separators: separators)
         }
         return processedLines.joined(separator: "\n")
     }
-    
+
+    // Splits a line into words on whitespace *and* the em dash, since poems often join two
+    // distinct words with an em dash and no surrounding space (e.g. "Charity—of"); treating
+    // that as a single token would hide both words behind one blank. Separators are kept
+    // alongside the words so `joinWords` can reconstruct the line exactly.
+    private func tokenizeLine(_ line: String) -> (words: [String], separators: [String]) {
+        var words: [String] = []
+        var separators: [String] = []
+        var currentWord = ""
+        for char in line {
+            let isSeparator = char == "\u{2014}" || String(char).rangeOfCharacter(from: .whitespaces) != nil
+            if isSeparator {
+                words.append(currentWord)
+                separators.append(String(char))
+                currentWord = ""
+            } else {
+                currentWord.append(char)
+            }
+        }
+        words.append(currentWord)
+        return (words, separators)
+    }
+
+    private func joinWords(_ words: [String], separators: [String]) -> String {
+        var result = ""
+        for (index, word) in words.enumerated() {
+            result += word
+            if index < separators.count {
+                result += separators[index]
+            }
+        }
+        return result
+    }
+
     private func separateWordFromPunctuation(_ word: String) -> (word: String, punctuation: String) {
         let punctuationChars = CharacterSet.punctuationCharacters
         var cleanWord = word
