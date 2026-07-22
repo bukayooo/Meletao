@@ -14,11 +14,11 @@ struct MemorizationView: View {
     @State private var processedTextCache: [String: String] = [:]
     
     private let stages = [
-        "Read and recite this section out loud at least 3 times.",
-        "Fill in the missing words (first letters shown).",
-        "Fill in more missing words.",
-        "Fill in even more missing words.",
-        "Complete the section from memory."
+        "Read and recite this section out loud at least 3 times. Focus as intently as you can on each indivudal word as you pronounce it.",
+        "Fill in the missing words (first letters shown). Focus as intently as you can on each indivudal word and blank as you pronounce it.",
+        "Fill in more missing words. Focus as intently as you can on each indivudal word and blank as you pronounce it.",
+        "Fill in even more missing words. Focus as intently as you can on each indivudal word and blank as you pronounce it.",
+        "Complete the section from memory. Focus as intently as you can on each indivudal blank as you pronounce it."
     ]
 
     // After 2+ prior review sessions the early stages are too easy — start at stage 4 (second to last)
