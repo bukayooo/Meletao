@@ -407,16 +407,17 @@ struct MemorizationView: View {
         return processedLines.joined(separator: "\n")
     }
 
-    // Splits a line into words on whitespace *and* the em dash, since poems often join two
-    // distinct words with an em dash and no surrounding space (e.g. "Charity—of"); treating
-    // that as a single token would hide both words behind one blank. Separators are kept
-    // alongside the words so `joinWords` can reconstruct the line exactly.
+    // Splits a line into words on whitespace and on the em dash, hyphen, and colon, since
+    // poems/passages often join two distinct words or numbers with one of these and no
+    // surrounding space (e.g. "Charity—of", "ever-living", "13:27"); treating that as a
+    // single token would hide both halves behind one blank. Separators are kept alongside
+    // the words so `joinWords` can reconstruct the line exactly.
     private func tokenizeLine(_ line: String) -> (words: [String], separators: [String]) {
         var words: [String] = []
         var separators: [String] = []
         var currentWord = ""
         for char in line {
-            let isSeparator = char == "\u{2014}" || String(char).rangeOfCharacter(from: .whitespaces) != nil
+            let isSeparator = char == "\u{2014}" || char == "-" || char == ":" || String(char).rangeOfCharacter(from: .whitespaces) != nil
             if isSeparator {
                 words.append(currentWord)
                 separators.append(String(char))
